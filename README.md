@@ -1,5 +1,3 @@
-****Formatea todo el texto para que quede bien y devuelvemelo dentro de un bloque de codigo para pegarlo en mi README.md:
-
 # ProyectoFinalCD
 
 En este repositorio vamos a incluir todo el progreso de la clase de Proyecto de Ciencia de Datos.
@@ -25,32 +23,31 @@ Los datos se obtienen desde la página [FBref](https://fbref.com/en/comps/12/La-
 - Tiros a puerta
 - Estadísticas defensivas y ofensivas de los equipos
 
-## Instalación
+### Instalación
 Para poder ejecutar el proyecto en tu entorno local, sigue los siguientes pasos:
 
 1. Clona este repositorio:
    ```bash
    git clone https://github.com/usuario/repositorio_prediccion_laliga.git
     ```
-# Instala las dependencias necesarias:
+### Instala las dependencias necesarias:
 pip install -r requirements.txt
 
-# Descarga los datos desde la página de FBref e inclúyelos en el directorio data/.
+### Descarga los datos desde la página de FBref e inclúyelos en el directorio data/.
 
-# Abre el notebook principal en el directorio notebooks/:
+### Abre el notebook principal en el directorio notebooks/:
 jupyter notebook notebooks/modelo_prediccion.ipynb
 
-# Ejecuta las celdas para:
-# - Realizar el preprocesamiento de los datos.
-# - Entrenar el modelo de regresión logística.
-# - Evaluar el rendimiento del modelo con los conjuntos de datos de prueba.
+### Ejecuta las celdas para:
+#### - Realizar el preprocesamiento de los datos.
+#### - Entrenar el modelo de regresión logística.
+#### - Evaluar el rendimiento del modelo con los conjuntos de datos de prueba.
 
-# Los resultados del modelo de regresión logística incluyen una matriz de confusión y un informe de clasificación.
-# Estos resultados se encuentran en el directorio results/.
+##### Los resultados del modelo de regresión logística incluyen una matriz de confusión y un informe de clasificación.
+###### Estos resultados se encuentran en el directorio results/.
 
-# Las contribuciones son bienvenidas. Si deseas mejorar el modelo o agregar nuevas características,
-# puedes crear un pull request o abrir un issue en el repositorio.
+##### Las contribuciones son bienvenidas. Si deseas mejorar el modelo o agregar nuevas características,
+##### puedes crear un pull request o abrir un issue en el repositorio.
 
-# Licencia:
-# Este proyecto está licenciado bajo la MIT License.
-
+### Licencia:
+##### Este proyecto está licenciado bajo la MIT License.
