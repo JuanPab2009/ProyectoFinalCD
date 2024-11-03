@@ -1,0 +1,20 @@
+# Use the official Python 3.8 slim image as base
+FROM python:3.8-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install MLflow and PostgreSQL adapter
+RUN pip install --no-cache-dir mlflow==2.7.0 psycopg2-binary
+
+# Expose port 5000 for MLflow server
+EXPOSE 5000
+
+# Set the entrypoint command to run MLflow server
+ENTRYPOINT ["mlflow", "server"]
