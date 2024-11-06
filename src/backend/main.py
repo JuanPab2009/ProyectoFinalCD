@@ -2,7 +2,7 @@ import mlflow
 from fastapi import FastAPI
 from pydantic import BaseModel
 import pandas as pd
-
+from fastapi.responses import JSONResponse
 
 # Load the model from MLflow Model Registry
 model_name = "LaLigaBestModel"
@@ -88,8 +88,13 @@ def predict_endpoint(input_data: InputData):
     features = preprocess(input_dict)
     # Make predictions
     predictions = model.predict(features)
+    # Since predictions is a 2D array of probabilities, get the class label
+    class_index = predictions.argmax(axis=1)[0]
+    # Map the class index to the actual class label if necessary
+    # For example, if your classes are [1, 2, 3], and the model outputs 0-based indices
+    class_label = class_index + 1  # Adjust based on your labeling
     # Return the predictions
-    return {"prediction": int(predictions[0])}
+    return JSONResponse(content={"prediction": int(class_label)})
 
 
 dependencies = mlflow.pyfunc.get_model_dependencies(model_uri)
