@@ -10,3 +10,8 @@ psycopg2-binary==2.9.6
 prefect==2.10.4
 openpyxl==3.1.2
 griffe==0.24.0
+apprise
+python-dotenv
+streamlit
+requests
+

@@ -1,20 +1,21 @@
-# Utilizar una imagen base de Python
+# Use a base Python image
 FROM python:3.8-slim
 
-# Establecer el directorio de trabajo
+# Set the working directory
 WORKDIR /app
 
-# Copiar los archivos de requisitos
+# Copy the requirements file
 COPY requirements.txt .
 
-# Instalar las dependencias
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar el resto de los archivos
+# Copy the rest of the application code
 COPY . .
 
-# Exponer el puerto de la API
+# Expose the port (if necessary for your application)
 EXPOSE 8000
 
-# Comando para ejecutar la API
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Set the entry point or command to run your application
+CMD ["python", "Training_pipeline.py"]
+
