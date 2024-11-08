@@ -1,6 +1,8 @@
 import streamlit as st
+import pandas as pd
 import requests
 import json
+import re
 
 st.write("""
 # LaLiga Match Result Predictor
@@ -10,131 +12,115 @@ st.sidebar.header('Input Parameters')
 
 def user_input_features():
     # Collect input from the user
-    Día = st.sidebar.number_input("Día", min_value=1, max_value=38, value=1)
-    Sedes = st.sidebar.selectbox("Sedes", options=[0,1], help="0 for away, 1 for home")
+    jornada = st.sidebar.number_input("Número de la jornada", min_value=1, max_value=38, value=1)
 
-    st.sidebar.subheader("Datos del Adversario (Opp)")
-    Edad_opp = st.sidebar.number_input("Edad_opp", value=28.0)
-    Pos_opp = st.sidebar.number_input("Posición_opp", value=10.0)
-    Ass_opp = st.sidebar.number_input("Asistencias_opp", min_value=0, value=5)
-    TPint_opp = st.sidebar.number_input("Total Pases interceptados_opp", min_value=0, value=10)
-    PrgC_opp = st.sidebar.number_input("Progresión con balón_opp", min_value=0, value=50)
-    PrgP_opp = st.sidebar.number_input("Progresión de pases_opp", min_value=0, value=70)
-    pct_de_TT_opp = st.sidebar.number_input("pct_de_TT_opp", min_value=0.0, max_value=100.0, value=50.0)
-    Dist_opp = st.sidebar.number_input("Distancia recorrida_opp", min_value=0.0, value=10000.0)
-    pct_Cmp_opp = st.sidebar.number_input("pct_Cmp_opp", min_value=0.0, max_value=100.0, value=80.0)
-    Dist_tot_opp = st.sidebar.number_input("Distancia total_opp", min_value=0.0, value=20000.0)
-    TklG_opp = st.sidebar.number_input("Tackles ganados_opp", min_value=0, value=20)
-    Int_opp = st.sidebar.number_input("Intercepciones_opp", min_value=0, value=15)
-    Err_opp = st.sidebar.number_input("Errores_opp", min_value=0, value=5)
-    RL_opp = st.sidebar.number_input("Ranking Liga_opp", min_value=1, max_value=20, value=10)
-    PG_opp = st.sidebar.number_input("Partidos ganados_opp", min_value=0, max_value=38, value=10)
-    PE_opp = st.sidebar.number_input("Partidos empatados_opp", min_value=0, max_value=38, value=10)
-    PP_opp = st.sidebar.number_input("Partidos perdidos_opp", min_value=0, max_value=38, value=10)
-    GF_opp = st.sidebar.number_input("Goles a favor_opp", min_value=0, value=30)
-    GC_opp = st.sidebar.number_input("Goles en contra_opp", min_value=0, value=30)
-    xG_opp = st.sidebar.number_input("xG_opp", min_value=0.0, value=40.0)
-    xGA_opp = st.sidebar.number_input("xGA_opp", min_value=0.0, value=30.0)
-    Ultimos5_opp = st.sidebar.number_input("Ultimos5_opp", min_value=0, max_value=15, value=2, help="Desempeño en los últimos 5 partidos")
-    Max_Goleador_opp = st.sidebar.number_input("Max_Goleador_opp", min_value=0, value=10)
-
-    st.sidebar.subheader("Datos del Equipo Local (tm)")
-    Edad_tm = st.sidebar.number_input("Edad_tm", value=28.0)
-    Pos_tm = st.sidebar.number_input("Posición_tm", value=10.0)
-    Ass_tm = st.sidebar.number_input("Asistencias_tm", min_value=0, value=5)
-    TPint_tm = st.sidebar.number_input("Total Pases interceptados_tm", min_value=0, value=10)
-    PrgC_tm = st.sidebar.number_input("Progresión con balón_tm", min_value=0, value=50)
-    PrgP_tm = st.sidebar.number_input("Progresión de pases_tm", min_value=0, value=70)
-    pct_de_TT_tm = st.sidebar.number_input("pct_de_TT_tm", min_value=0.0, max_value=100.0, value=50.0)
-    Dist_tm = st.sidebar.number_input("Distancia recorrida_tm", min_value=0.0, value=10000.0)
-    pct_Cmp_tm = st.sidebar.number_input("pct_Cmp_tm", min_value=0.0, max_value=100.0, value=80.0)
-    Dist_tot_tm = st.sidebar.number_input("Distancia total_tm", min_value=0.0, value=20000.0)
-    TklG_tm = st.sidebar.number_input("Tackles ganados_tm", min_value=0, value=20)
-    Int_tm = st.sidebar.number_input("Intercepciones_tm", min_value=0, value=15)
-    Err_tm = st.sidebar.number_input("Errores_tm", min_value=0, value=5)
-    RL_tm = st.sidebar.number_input("Ranking Liga_tm", min_value=1, max_value=20, value=10)
-    PG_tm = st.sidebar.number_input("Partidos ganados_tm", min_value=0, max_value=38, value=10)
-    PE_tm = st.sidebar.number_input("Partidos empatados_tm", min_value=0, max_value=38, value=10)
-    PP_tm = st.sidebar.number_input("Partidos perdidos_tm", min_value=0, max_value=38, value=10)
-    GF_tm = st.sidebar.number_input("Goles a favor_tm", min_value=0, value=30)
-    GC_tm = st.sidebar.number_input("Goles en contra_tm", min_value=0, value=30)
-    xG_tm = st.sidebar.number_input("xG_tm", min_value=0.0, value=40.0)
-    xGA_tm = st.sidebar.number_input("xGA_tm", min_value=0.0, value=30.0)
-    Ultimos5_tm = st.sidebar.number_input("Ultimos5_tm", min_value=0, max_value=15, value=2, help="Desempeño en los últimos 5 partidos")
-    Max_Goleador_tm = st.sidebar.number_input("Max_Goleador_tm", min_value=0, value=10)
-
-    input_dict = {
-        "Día": Día,
-        "Sedes": Sedes,
-        "Edad_opp": Edad_opp,
-        "Pos_opp": Pos_opp,
-        "Ass_opp": Ass_opp,
-        "TPint_opp": TPint_opp,
-        "PrgC_opp": PrgC_opp,
-        "PrgP_opp": PrgP_opp,
-        "pct_de_TT_opp": pct_de_TT_opp,
-        "Dist_opp": Dist_opp,
-        "pct_Cmp_opp": pct_Cmp_opp,
-        "Dist_tot_opp": Dist_tot_opp,
-        "TklG_opp": TklG_opp,
-        "Int_opp": Int_opp,
-        "Err_opp": Err_opp,
-        "RL_opp": RL_opp,
-        "PG_opp": PG_opp,
-        "PE_opp": PE_opp,
-        "PP_opp": PP_opp,
-        "GF_opp": GF_opp,
-        "GC_opp": GC_opp,
-        "xG_opp": xG_opp,
-        "xGA_opp": xGA_opp,
-        "Ultimos5_opp": Ultimos5_opp,
-        "Max_Goleador_opp": Max_Goleador_opp,
-        "Edad_tm": Edad_tm,
-        "Pos_tm": Pos_tm,
-        "Ass_tm": Ass_tm,
-        "TPint_tm": TPint_tm,
-        "PrgC_tm": PrgC_tm,
-        "PrgP_tm": PrgP_tm,
-        "pct_de_TT_tm": pct_de_TT_tm,
-        "Dist_tm": Dist_tm,
-        "pct_Cmp_tm": pct_Cmp_tm,
-        "Dist_tot_tm": Dist_tot_tm,
-        "TklG_tm": TklG_tm,
-        "Int_tm": Int_tm,
-        "Err_tm": Err_tm,
-        "RL_tm": RL_tm,
-        "PG_tm": PG_tm,
-        "PE_tm": PE_tm,
-        "PP_tm": PP_tm,
-        "GF_tm": GF_tm,
-        "GC_tm": GC_tm,
-        "xG_tm": xG_tm,
-        "xGA_tm": xGA_tm,
-        "Ultimos5_tm": Ultimos5_tm,
-        "Max_Goleador_tm": Max_Goleador_tm
+    url = "https://fbref.com/es/comps/12/horario/Resultados-y-partidos-en-La-Liga"
+    tables = pd.read_html(url)
+    df = tables[0]
+    # seleccionamos las variables
+    df = df[['Sem.', 'Día', 'Fecha', 'Local', 'Visitante']]
+    # Hacemos la columna fecha del formato correspondiente
+    df["Fecha"] = pd.to_datetime(df["Fecha"])
+    # Hacemos el encoding de los días
+    dias_map = {
+        'Lun': 1,
+        'Mar': 2,
+        'Mié': 3,
+        'Jue': 4,
+        'Vie': 5,
+        'Sáb': 6,
+        'Dom': 7
     }
+    df["Día"] = df["Día"].map(dias_map)
+    # Filtramos por jornada
+    df = df[df["Sem."] == jornada]
+    # Agregamos la columna de sede
+    df["Sedes"] = 1
+    # Renombramos las columnas
+    df = df[["Día", "Sedes", "Visitante", "Local"]]
+    df = df.rename(columns={"Local": "Anfitrion", "Visitante": "Adversario"})
+    # Duplicamos el dataframe e invertimos las columnas para hacer la concatenación
+    df_2 = df.copy()
+    df_2 = df_2.rename(columns={"Adversario": "Anfitrion", "Anfitrion": "Adversario"})
+    df_2["Sedes"] = 0
+    df = pd.concat([df, df_2], ignore_index=True)
+    df["Día"] = df["Día"].astype(int)
+    ### Estadísticas básicas
+    url = "https://fbref.com/es/comps/12/Estadisticas-de-La-Liga"
+    tables = pd.read_html(url)
+    df_basic = tables[0]
+    df_basic = df_basic[['RL', 'Equipo', 'PG', 'PE', 'PP', 'GF', 'GC', 'xG', 'xGA', 'Últimos 5', 'Máximo Goleador del Equipo']]
+    df_basic['Máximo Goleador del Equipo'] = df_basic['Máximo Goleador del Equipo'].apply(
+        lambda x: int(re.search(r'\b(\d+)\b', x).group(1)) if re.search(r'\b(\d+)\b', x) else None)
+    df_basic['Últimos 5'] = df_basic['Últimos 5'].apply(lambda resultados: sum(
+        [3 if resultado == 'PG' else (1 if resultado == 'PE' else 0) for resultado in resultados.split()]))
 
-    return input_dict
+    ### Estadísticas de ofensiva
+    df_ataque = tables[2].drop(["Tiempo Jugado", "Expectativa", 'Por 90 Minutos'], axis=1)
+    df_ataque.columns = df_ataque.columns.droplevel(level=0)
+    df_ataque = df_ataque[['Equipo', 'Edad', 'Pos.', 'Ass', 'TPint', 'PrgC', 'PrgP']]
 
-input_dict = user_input_features()
+    # Disparos
+    df_disparos = tables[8]
+    df_disparos.columns = df_disparos.columns.droplevel(level=0)
+    df_disparos = df_disparos[['Equipo', '% de TT', 'Dist']]
+    df_ataque = pd.merge(df_ataque, df_disparos, left_on='Equipo', right_on='Equipo', how='left')
+
+    # Pases
+    df_pases = tables[10].drop(["Cortos", "Medios", 'Largos', 'Expectativa'], axis=1)
+    df_pases.columns = df_pases.columns.droplevel(level=0)
+    df_pases = df_pases[['Equipo', '% Cmp', 'Dist. tot.']]
+    df_ataque = pd.merge(df_ataque, df_pases, left_on='Equipo', right_on='Equipo', how='left')
+
+    ### Estadísticas de defensa
+    df_porteria = tables[4].drop(["Tiempo Jugado", "Tiros penales"], axis=1)
+    df_porteria.columns = df_porteria.columns.droplevel(level=0)
+    df_porteria = df_porteria[['Equipo', 'GC', 'DaPC', 'Salvadas', 'PaC']]
+    df_defensa = tables[16].drop(['Desafíos'], axis=1)
+    df_defensa.columns = df_defensa.columns.droplevel(level=0)
+    df_defensa = df_defensa[['Equipo', 'TklG', 'Int', 'Err']]
+    df_final = pd.merge(df_ataque, df_defensa, left_on='Equipo', right_on='Equipo', how='left')
+    df_final = pd.merge(df_final, df_basic, left_on='Equipo', right_on='Equipo', how='left')
+    df_opp = df_final.copy()
+    df_tm = df_final.copy()
+
+    # Renombramos las columnas
+    columns_to_rename = ['Edad', 'Pos.', 'Ass', 'TPint', 'PrgC', 'PrgP', '% de TT',
+                         'Dist', '% Cmp', 'Dist. tot.', 'TklG', 'Int', 'Err', 'RL', 'PG', 'PE',
+                         'PP', 'GF', 'GC', 'xG', 'xGA', 'Últimos 5', 'Máximo Goleador del Equipo']
+    new_column_names_tm = [f"{col}(tm)" for col in columns_to_rename]
+    df_tm.rename(columns=dict(zip(columns_to_rename, new_column_names_tm)), inplace=True)
+    new_column_names_opp = [f"{col}(opp)" for col in columns_to_rename]
+    df_opp.rename(columns=dict(zip(columns_to_rename, new_column_names_opp)), inplace=True)
+
+    df = pd.merge(df, df_opp, left_on='Adversario', right_on='Equipo', how='left')
+    df = pd.merge(df, df_tm, left_on='Anfitrion', right_on='Equipo', how='left')
+    df = df.drop(['Equipo_x', 'Equipo_y'], axis=1)
+
+    X = df[['Día','Sedes','Edad(opp)','Pos.(opp)', 'Ass(opp)', 'TPint(opp)',
+      'PrgC(opp)', 'PrgP(opp)','% de TT(opp)', 'Dist(opp)', '% Cmp(opp)', 'Dist. tot.(opp)','TklG(opp)', 'Int(opp)',
+      'Err(opp)', 'RL(opp)', 'PG(opp)', 'PE(opp)','PP(opp)', 'GF(opp)', 'GC(opp)', 'xG(opp)', 'xGA(opp)','Últimos 5(opp)',
+      'Máximo Goleador del Equipo(opp)', 'Edad(tm)', 'Pos.(tm)', 'Ass(tm)', 'TPint(tm)', 'PrgC(tm)', 'PrgP(tm)',
+      '% de TT(tm)', 'Dist(tm)', '% Cmp(tm)', 'Dist. tot.(tm)', 'TklG(tm)','Int(tm)', 'Err(tm)', 'RL(tm)', 'PG(tm)',
+      'PE(tm)', 'PP(tm)', 'GF(tm)','GC(tm)', 'xG(tm)', 'xGA(tm)', 'Últimos 5(tm)','Máximo Goleador del Equipo(tm)']]
+
+    jornada_dict = X.iloc[0].to_dict()
+    return jornada_dict,df
+
+input_dict,df = user_input_features()
 
 if st.button('Predict'):
-    # In frontend/main.py
     response = requests.post(
-    url="http://laliga-model-container:8001/predict",  # Change 'laliga-model-container' to 'model' http://model:8001/predict
-    data=json.dumps(input_dict)
-)
-
+        url="http://model:8001/predict",
+        data=json.dumps(input_dict)
+    )
     if response.status_code == 200:
-        prediction = response.json()['prediction']
-        if prediction == 1:
-            result = "Empate"
-        elif prediction == 2:
-            result = "Gana el equipo visitante"
-        elif prediction == 3:
-            result = "Gana el equipo local"
-        else:
-            result = "Resultado desconocido"
-        st.write(f"El resultado predicho es: {result}")
+        # Assuming the response contains probabilities
+        probabilities = response.json()
+        final_probabilites = pd.DataFrame(probabilities)
+        final_probabilites['Anfitrion'] = df['Anfitrion']
+        final_probabilites['Rival']=df['Adversario']
+        st.write("### Predicted Probabilities")
+        st.write(final_probabilites)
     else:
-        st.write("Error en la predicción")
+        st.error("Error in the prediction request.")
