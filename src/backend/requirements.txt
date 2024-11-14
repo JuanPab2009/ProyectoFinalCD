@@ -7,4 +7,5 @@ xgboost==1.7.5
 fastapi
 uvicorn
 scipy==1.14.1
+dagshub
 
