@@ -3,7 +3,10 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import pandas as pd
 from fastapi.responses import JSONResponse
+import logging
+from pydantic import BaseModel, Field
 
+logging.basicConfig(level=logging.INFO)
 # Load the model from MLflow Model Registry
 model_name = "LaLigaBestModel"
 model_version = 2  # Update to the desired version
@@ -31,7 +34,7 @@ app = FastAPI()
 
 # Define the input data model using Pydantic
 class InputData(BaseModel):
-    Día: int
+    Dia: int  # Cambiado de 'Día' a 'Dia'
     Sedes: int
     Edad_opp: float
     Pos_opp: float
@@ -54,8 +57,8 @@ class InputData(BaseModel):
     GC_opp: int
     xG_opp: float
     xGA_opp: float
-    Ultimos5_opp: int
-    Max_Goleador_opp: int
+    Ultimos5_opp: int  # Asegurar que coincide
+    Max_Goleador_opp: int  # Asegurar que coincide
     Edad_tm: float
     Pos_tm: float
     Ass_tm: int
@@ -77,24 +80,23 @@ class InputData(BaseModel):
     GC_tm: int
     xG_tm: float
     xGA_tm: float
-    Ultimos5_tm: int
-    Max_Goleador_tm: int
+    Ultimos5_tm: int  # Asegurar que coincide
+    Max_Goleador_tm: int  # Asegurar que coincide
 
 @app.post("/predict")
 def predict_endpoint(input_data: InputData):
-    # Convert input data to dictionary
-    input_dict = input_data.dict()
-    # Preprocess the input data
-    features = preprocess(input_dict)
-    # Make predictions
-    predictions = model.predict(features)
-    # Since predictions is a 2D array of probabilities, get the class label
-    class_index = predictions.argmax(axis=1)[0]
-    # Map the class index to the actual class label if necessary
-    # For example, if your classes are [1, 2, 3], and the model outputs 0-based indices
-    class_label = class_index + 1  # Adjust based on your labeling
-    # Return the predictions
-    return JSONResponse(content={"prediction": int(class_label)})
+    try:
+        input_dict = input_data.dict()
+        logging.info(f"Received input data: {input_dict}")
+
+        features = preprocess(input_dict)
+        predictions = model.predict(features)
+        class_index = predictions.argmax(axis=1)[0]
+        class_label = class_index + 1  # Adjust if necessary
+        return JSONResponse(content={"prediction": int(class_label)})
+    except Exception as e:
+        logging.error(f"Error during prediction: {e}")
+        return JSONResponse(content={"error": str(e)}, status_code=500)
 
 
 dependencies = mlflow.pyfunc.get_model_dependencies(model_uri)

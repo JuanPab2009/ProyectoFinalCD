@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import json
 import re
+from unidecode import unidecode
 
 st.write("""
 # LaLiga Match Result Predictor
@@ -104,8 +105,31 @@ def user_input_features():
       '% de TT(tm)', 'Dist(tm)', '% Cmp(tm)', 'Dist. tot.(tm)', 'TklG(tm)','Int(tm)', 'Err(tm)', 'RL(tm)', 'PG(tm)',
       'PE(tm)', 'PP(tm)', 'GF(tm)','GC(tm)', 'xG(tm)', 'xGA(tm)', 'Últimos 5(tm)','Máximo Goleador del Equipo(tm)']]
 
+    # Convertimos X a un diccionario
     jornada_dict = X.iloc[0].to_dict()
-    return jornada_dict,df
+
+    # Ajustamos los nombres de las claves para que coincidan con el backend
+    input_dict = {}
+    for key, value in jornada_dict.items():
+        # Reemplazar caracteres especiales y espacios
+        new_key = key.replace('(', '_').replace(')', '').replace('.', '').replace('%', 'pct').replace(' ', '_')
+        # Eliminar acentos y caracteres especiales
+        new_key = unidecode(new_key)
+        # Casos especiales
+        if new_key == 'Ultimos_5_opp':
+            new_key = 'Ultimos5_opp'
+        elif new_key == 'Ultimos_5_tm':
+            new_key = 'Ultimos5_tm'
+        elif new_key == 'Maximo_Goleador_del_Equipo_opp':
+            new_key = 'Max_Goleador_opp'
+        elif new_key == 'Maximo_Goleador_del_Equipo_tm':
+            new_key = 'Max_Goleador_tm'
+        input_dict[new_key] = value
+
+    # Opcional: imprimir el diccionario para verificar
+    print("Input dict:", input_dict)
+
+    return input_dict, df
 
 input_dict,df = user_input_features()
 
@@ -123,4 +147,4 @@ if st.button('Predict'):
         st.write("### Predicted Probabilities")
         st.write(final_probabilites)
     else:
-        st.error("Error in the prediction request.")
+        st.error(f"Error in the prediction request: {response.status_code} - {response.text}")
