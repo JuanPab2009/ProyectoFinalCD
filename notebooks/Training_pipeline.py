@@ -295,6 +295,7 @@ def hyper_parameter_tunning(X_train, X_test, y_train, y_test):
 
             # Realizamos las predicciones
             y_pred = model.predict(dtest)
+            y_pred = y_pred.argmax(axis = 1)
 
             # Calculamos las métricas
             accuracy = accuracy_score(y_test, y_pred)
@@ -362,6 +363,7 @@ def train_best_model(X_train, X_test, y_train, y_test, best_params_xgb) -> None:
         )
 
         y_pred_xgb = best_model_xgb.predict(dtest)
+        y_pred_xgb = y_pred_xgb.argmax(axis=-1)
         accuracy_xgb = accuracy_score(y_test, y_pred_xgb)
         precision_xgb = precision_score(y_test, y_pred_xgb, average='weighted')
         recall_xgb = recall_score(y_test, y_pred_xgb, average='weighted')
