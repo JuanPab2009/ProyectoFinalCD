@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 import re
 import dagshub
 import mlflow
+from sklearn.preprocessing import StandardScaler
 
 # Load the model from MLflow Model Registry
 model_name = "LaLigaBestModel"
@@ -132,7 +133,8 @@ def predict(input_data):
                        'RL(tm)', 'PG(tm)',
                        'PE(tm)', 'PP(tm)', 'GF(tm)', 'GC(tm)', 'xG(tm)', 'xGA(tm)', 'Últimos 5(tm)',
                        'Máximo Goleador del Equipo(tm)']]
-
+    sc = StandardScaler()
+    predicted_df = sc.fit_transform(predicted_df)
     logged_model = 'runs:/e8e41ab35bd34545a81ccb039080a64c/model'
 
     # Load model as a PyFuncModel.
